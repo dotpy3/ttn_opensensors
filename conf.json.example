@@ -1,0 +1,15 @@
+{
+  "OpenSensors": {
+    "apiKey": "",
+    "apiUrl": "https://realtime.opensensors.io/v1/",
+    "deviceID": "",
+    "devicePassword": "",
+    "topicName": "",
+    "username": ""
+  },
+  "TTN": {
+    "accessKey": "",
+    "applicationID": "",
+    "region": ""
+  }
+}
