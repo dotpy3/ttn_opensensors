@@ -19,6 +19,7 @@ type OpenSensorsConf struct {
 type TTNConf struct {
 	accessKey     string
 	applicationID string
+	deviceID      string
 	region        string
 }
 

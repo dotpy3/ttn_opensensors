@@ -32,7 +32,7 @@ func (cli OpenSensorsClient) postToAPI(data string) (*http.Response, error) {
 	return http.Post(cli.getAPICallURL(), "application/json", bytes.NewBuffer(encodedPayload))
 }
 
-func (cli OpenSensorsClient) post(data string) bool {
+func (cli OpenSensorsClient) post(data string) error {
 	_, err := cli.postToAPI(data)
-	return err == nil
+	return err
 }

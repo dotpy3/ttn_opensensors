@@ -10,6 +10,7 @@
   "TTN": {
     "accessKey": "",
     "applicationID": "",
+    "deviceID": "",
     "region": ""
   }
 }

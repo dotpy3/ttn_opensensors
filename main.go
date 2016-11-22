@@ -23,11 +23,15 @@ func main() {
 		os.Exit(0)
 	}
 	OSCli := OpenSensorsClient{conf.OpenSensors}
-	token := client.SubscribeDeviceUplink("my-app-id", "my-dev-id", func(client TTNMQTT.Client, appID string, devID string, req types.UplinkMessage) {
+	token := client.SubscribeDeviceUplink(conf.TTN.applicationID, conf.TTN.deviceID, func(client TTNMQTT.Client, appID string, devID string, req types.UplinkMessage) {
 		length := bytes.IndexByte(req.PayloadRaw, 0)
 		payload := string(req.PayloadRaw[:length])
 		fmt.Println("Uplink message received: " + payload)
-		OSCli.post(payload)
+		if err := OSCli.post(payload); err != nil {
+			fmt.Println("Error transmitting the message to OpenSensors: " + err.Error())
+		} else {
+			fmt.Println("Message successfuly transmitted to OpenSensors.")
+		}
 	})
 	token.Wait()
 	if err := token.Error(); err != nil {
