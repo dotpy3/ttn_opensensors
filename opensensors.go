@@ -3,8 +3,6 @@ package main
 import "net/http"
 import "encoding/json"
 import "bytes"
-import "github.com/mitchellh/mapstructure"
-import "fmt"
 
 // OpenSensorsClient provides an API to interact with the OpenSensorsClient HTTP API
 type OpenSensorsClient struct {
@@ -19,23 +17,37 @@ func (cli OpenSensorsClient) getAPICallURL() string {
 
 func (cli OpenSensorsClient) postToAPI(data []byte) (*http.Response, error) {
 	httpClient := &http.Client{}
-	fmt.Println("Payload to be expected:" + string(data[:]))
-	req, err := http.NewRequest("POST", cli.getAPICallURL(), bytes.NewReader(data))
+	bytesData := bytes.NewReader(data)
+	req, err := http.NewRequest("POST", cli.getAPICallURL(), bytesData)
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Authorization", "api-key "+cli.conf.APIKEY)
-	fmt.Println("Body of the request: " + ReaderToString(req.Body))
 	return httpClient.Do(req)
 }
 
+// OSPayload allows us to encapsulate the data in a OS-readable format
+type OSPayload struct {
+	data map[string]interface{}
+}
+
+func encapsulateIntoData(data map[string]interface{}) (map[string]interface{}, error) {
+	stringifiedData, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+	payload := make(map[string]interface{})
+	payload["data"] = string(stringifiedData[:])
+	return payload, nil
+}
+
 func (cli OpenSensorsClient) postMQTTPayload(data map[string]interface{}) (*http.Response, error) {
-	fmt.Printf("dump1:\n%+v\n\n", data)
-	var rawData interface{}
-	mapstructure.Decode(data, rawData)
-	fmt.Printf("dump2:\n%+v\n\n", rawData)
-	payload, err := json.Marshal(rawData)
+	encapsulatedData, err := encapsulateIntoData(data)
+	if err != nil {
+		return nil, err
+	}
+	payload, err := json.Marshal(encapsulatedData)
 	if err != nil {
 		return nil, err
 	}

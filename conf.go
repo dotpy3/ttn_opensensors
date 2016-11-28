@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 )
 
@@ -37,7 +36,6 @@ func confFileReader() (Conf, error) {
 	if err != nil {
 		return conf, err
 	}
-	fmt.Println(string(file))
 	err = json.Unmarshal(file, &conf)
 	if err != nil {
 		return conf, err

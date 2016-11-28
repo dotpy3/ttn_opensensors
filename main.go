@@ -30,19 +30,17 @@ func main() {
 	fmt.Println("Client initialized.")
 
 	token := client.SubscribeDeviceUplink(conf.TTN.ApplicationID, conf.TTN.DeviceID, func(client TTNMQTT.Client, appID string, devID string, req types.UplinkMessage) {
-		fmt.Println("Message reception")
-		fmt.Println("Message fields:")
-		for k := range req.PayloadFields {
-			fmt.Println("- " + k)
-		}
-		if rep, err := OSCli.postMQTTPayload(req.PayloadFields); err != nil || rep.StatusCode != 200 {
-			if rep.StatusCode != 200 {
+		fmt.Println("\n\n=========================\nMESSAGE RECEPTION\n")
+		if rep, err := OSCli.postMQTTPayload(req.PayloadFields); err != nil || ErrorResponse(rep) {
+			if ErrorResponse(rep) {
 				fmt.Println("Error " + strconv.Itoa(rep.StatusCode) + ": " + ReaderToString(rep.Body))
-			} else {
+			} else if err != nil {
 				fmt.Println("Error transmitting the message to OpenSensors: " + err.Error())
+			} else {
+				fmt.Println("No response transmitted")
 			}
 		} else {
-			fmt.Println("Message successfuly transmitted to OpenSensors.")
+			fmt.Println("Message successfuly retransmitted to OpenSensors.")
 		}
 	})
 
